@@ -1,5 +1,5 @@
 -- Sweet Bees
--- v1.0.0 @midworld
+-- v1.1.0 @midworld
 -- llllllll.co/t/sweet-bees
 -- 
 -- Two-Track Asynchronous
@@ -31,11 +31,22 @@ function init()
   animation.event = function() redraw() end                         -- updates the screen at the animation rate
   animation:start()                                                 -- starts the animation loop
   
+  --Parameters
+  
+  params:add_separator("SWEET BEES")
+  params:add_option("INPUT >", "INPUT >", {"mono (left)", "stereo"}, 1)
+  params:set_action("INPUT", function(x) set_input(x) end)  
+  
   -- Softcut
   
   softcut.buffer_clear()                                            -- clears the buffers
   softcut.event_phase(update_tape)                                  -- sets function for softcut phase poll
   softcut.poll_start_phase()                                        -- starts the softcut phase poll
+  
+  softcut.level_input_cut(1, 1, 1)                                  -- mono inputs
+  softcut.level_input_cut(2, 1, 0)
+  softcut.level_input_cut(1, 2, 1)
+  softcut.level_input_cut(2, 2, 0)  
   
   for i = 1, 2 do
     softcut.enable(i,1)                                             -- enables voices 1 and 2
@@ -49,7 +60,6 @@ function init()
     softcut.rec_level(i,1)                                          -- sets record levels of voices 1 and 2
     softcut.rate(i,1.0)                                             -- sets rate of voices 1 and 2 to x1
     softcut.phase_quant(i,.25)                                      -- sets poll updates to four times per second for voices 1 and 2
-    softcut.level_input_cut(1,i,1)                                  -- sets softcut input to mono
   end
   
   -- Honeycomb Reverb
@@ -288,6 +298,22 @@ function init()
   tapeloops = {   {00,00,00,00,00,00,00},                           -- 1. pilot flag, 2. position, 3. record flag, 4. length,
                   {00,00,00,00,00,00,00} }                          -- 5. speed, 6. volume, 7. egg flag
                 
+end
+
+function set_input(x)
+  
+  if x == 1 then
+    softcut.level_input_cut(1, 1, 1)
+    softcut.level_input_cut(2, 1, 0)
+    softcut.level_input_cut(1, 2, 1)
+    softcut.level_input_cut(2, 2, 0)
+  else
+    softcut.level_input_cut(1, 1, 1)
+    softcut.level_input_cut(2, 1, 0)
+    softcut.level_input_cut(1, 2, 0)
+    softcut.level_input_cut(2, 2, 1)
+  end
+  
 end
 
 function update_tape(voice,position)                                
