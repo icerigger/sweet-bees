@@ -1,5 +1,5 @@
 -- Sweet Bees
--- v1.2.1 @midworld
+-- v1.2.0 @midworld
 -- llllllll.co/t/sweet-bees
 -- 
 -- Two-Track Asynchronous
