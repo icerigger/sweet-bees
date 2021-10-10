@@ -1,5 +1,5 @@
 -- Sweet Bees
--- v1.1.0 @midworld
+-- v1.1.1 @midworld
 -- llllllll.co/t/sweet-bees
 -- 
 -- Two-Track Asynchronous
@@ -35,7 +35,7 @@ function init()
   
   params:add_separator("SWEET BEES")
   params:add_option("INPUT >", "INPUT >", {"mono (left)", "stereo"}, 1)
-  params:set_action("INPUT", function(x) set_input(x) end)  
+  params:set_action("INPUT >", function(x) set_input(x) end)  
   
   -- Softcut
   
