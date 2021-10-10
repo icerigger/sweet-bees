@@ -11,8 +11,10 @@
 -- E3: T2 Volume
 -- K2: T1 Record/Loop
 -- K3: T2 Record/Loop
--- K1+K2: T1 Slow/Stop/Play
--- K1+K3: T2 Slow/Stop/Play
+-- K1+E2: T1 Pitch Control
+-- K1+E3: T2 Pitch Control
+-- K1+K2: T1 Reverse/Forward
+-- K1+K3: T2 Reverse/Forward
 
 -- K2 (hold): T1 Easter Egg
 -- K3 (hold): T2 Easter Egg
@@ -295,8 +297,8 @@ function init()
               
   preset = 0                                                        -- honeycomb reverb preset
   shift = 0                                                         -- shift flag
-  tapeloops = {   {00,00,00,00,00,00,00},                           -- 1. pilot flag, 2. position, 3. record flag, 4. length,
-                  {00,00,00,00,00,00,00} }                          -- 5. speed, 6. volume, 7. egg flag
+  tapeloops = {   {00,00,00,00,01,00,00,14},                        -- 1. pilot flag, 2. position, 3. record flag, 4. length,
+                  {00,00,00,00,01,00,00,14} }                       -- 5. speed, 6. volume, 7. egg flag, 8. tape color
                 
 end
 
@@ -347,24 +349,52 @@ function enc(n,d)
       audio:rev_off ()
     end
     redraw()
-  elseif n == 2 then                                                
-    tapeloops[1][6] = tapeloops[1][6] + d
-    if tapeloops[1][6] < 1 then
-      tapeloops[1][6] = 0
-    elseif tapeloops[1][6] > 14 then
-      tapeloops[1][6] = 14
+  end
+  
+  if n == 2 then
+    if shift == 0 then
+      tapeloops[1][6] = tapeloops[1][6] + d
+      if tapeloops[1][6] < 1 then
+        tapeloops[1][6] = 0
+      elseif tapeloops[1][6] > 14 then
+        tapeloops[1][6] = 14
+      end
+      softcut.level(1, tapeloops[1][6] / 14)
+      redraw()
     end
-    softcut.level(1, tapeloops[1][6] / 14)
-    redraw()
-  elseif n == 3 then                                                
-    tapeloops[2][6] = tapeloops[2][6] + d
-    if tapeloops[2][6] < 1 then
-      tapeloops[2][6] = 0
-    elseif tapeloops[2][6] > 14 then
-      tapeloops[2][6] = 14
+    if shift == 1 and tapeloops[1][3] == 0 then
+      tapeloops[1][8] = tapeloops[1][8] + d
+      if tapeloops[1][8] < 1 then
+        tapeloops[1][8] = 0
+      elseif tapeloops[1][8] > 14 then
+        tapeloops[1][8] = 14
+      end
+      softcut.rate(1,(tapeloops[1][8]/14)*tapeloops[1][5])
+      redraw()
     end
-    softcut.level(2, tapeloops[2][6] / 14)
-    redraw()
+  end
+  
+  if n == 3 then
+    if shift == 0 then
+      tapeloops[2][6] = tapeloops[2][6] + d
+      if tapeloops[2][6] < 1 then
+        tapeloops[2][6] = 0
+      elseif tapeloops[2][6] > 14 then
+        tapeloops[2][6] = 14
+      end
+      softcut.level(2, tapeloops[2][6] / 14)
+      redraw()
+    end
+    if shift == 1 and tapeloops[2][3] == 0 then
+      tapeloops[2][8] = tapeloops[2][8] + d
+      if tapeloops[2][8] < 1 then
+        tapeloops[2][8] = 0
+      elseif tapeloops[2][8] > 14 then
+        tapeloops[2][8] = 14
+      end
+      softcut.rate(2,(tapeloops[2][8]/14)*tapeloops[2][5])
+      redraw()
+    end
   end
   
 end
@@ -388,15 +418,12 @@ function key(n,z)
         end
       else
         if shift == 1 then
-          if tapeloops[1][3] == 0 and tapeloops[1][5] == 0 then
-            softcut.rate(1,.5)
+          if tapeloops[1][3] == 0 and tapeloops[1][5] == 1 then
+            tapeloops[1][5] = -1
+            softcut.rate(1,(tapeloops[1][8]/14)*tapeloops[1][5])
+          elseif tapeloops[1][3] == 0 and tapeloops[1][5] == -1 then
             tapeloops[1][5] = 1
-          elseif tapeloops[1][3] == 0 and tapeloops[1][5] == 1 then
-            softcut.rate(1,0)
-            tapeloops[1][5] = 2
-          else
-            softcut.rate(1,1)
-            tapeloops[1][5] = 0
+            softcut.rate(1,(tapeloops[1][8]/14)*tapeloops[1][5])
           end
         else  
           if tapeloops[1][3] == 0 then
@@ -405,8 +432,8 @@ function key(n,z)
             softcut.play(1,0)
             softcut.rec(1,1)
             softcut.loop_end(1,33)
-            tapeloops[1][5] = 0
             softcut.rate(1,1)
+            tapeloops[1][8] = 14
             tapeloops[1][4] = 0
             tapeloops[1][3] = 1
             tapeloops[1][1] = 1
@@ -436,15 +463,12 @@ function key(n,z)
         end
       else
         if shift == 1 then
-          if tapeloops[2][3] == 0 and tapeloops[2][5] == 0 then
-            softcut.rate(2,.5)
+           if tapeloops[2][3] == 0 and tapeloops[2][5] == 1 then
+            tapeloops[2][5] = -1
+            softcut.rate(2,(tapeloops[2][8]/14)*tapeloops[2][5])
+          elseif tapeloops[2][3] == 0 and tapeloops[2][5] == -1 then
             tapeloops[2][5] = 1
-          elseif tapeloops[2][3] == 0 and tapeloops[2][5] == 1 then
-            softcut.rate(2,0)
-            tapeloops[2][5] = 2
-          else
-            softcut.rate(2,1)
-            tapeloops[2][5] = 0
+            softcut.rate(2,(tapeloops[2][8]/14)*tapeloops[2][5])
           end
         else
           if tapeloops[2][3] == 0 then
@@ -453,8 +477,8 @@ function key(n,z)
             softcut.play(2,0)
             softcut.rec(2,1)
             softcut.loop_end(2,33)
-            tapeloops[2][5] = 0
             softcut.rate(2,1)
+            tapeloops[2][8] = 14
             tapeloops[2][4] = 0
             tapeloops[2][3] = 1
             tapeloops[2][1] = 1
@@ -529,6 +553,8 @@ function redraw()
     end
   end
   
+  -- Volume Brackets
+  
   screen.level(tapeloops[1][6]+1)
   screen.line_width(1)
   screen.rect(49,45,33-tapeloops[1][4],5)
@@ -537,9 +563,11 @@ function redraw()
   screen.rect(93,45,33-tapeloops[2][4],5)
   screen.stroke()
   
+  -- Tape Color
+  
   if tapeloops[1][3] == 1 then
     for x = 1, tapeloops[1][2] do
-      screen.level(4)
+      screen.level(15)
       screen.line_width(4)
       screen.move(49,47)
       screen.line(49+x,47)
@@ -553,13 +581,7 @@ function redraw()
     end
   else
     for x = 1, tapeloops[1][2] do
-      if tapeloops[1][5] == 0 then
-        screen.level(15)
-      elseif tapeloops[1][5] == 1 then
-        screen.level(4)
-      else
-        screen.level(1)    
-      end
+      screen.level(tapeloops[1][8]+1)
       screen.line_width(4)
       screen.move(49,47)
       screen.line(49+x,47)
@@ -569,7 +591,7 @@ function redraw()
   
   if tapeloops[2][3] == 1 then
     for x = 1, tapeloops[2][2] do
-      screen.level(4)
+      screen.level(15)
       screen.line_width(4)
       screen.move(93,47)
       screen.line(93+x,47)
@@ -583,13 +605,7 @@ function redraw()
     end
   else
     for x = 1, tapeloops[2][2] do
-      if tapeloops[2][5] == 0 then
-        screen.level(15)
-      elseif tapeloops[2][5] == 1 then
-        screen.level(4)
-      else
-        screen.level(1)
-      end
+      screen.level(tapeloops[2][8]+1)
       screen.line_width(4)
       screen.move(93,47)
       screen.line(93+x,47)
@@ -605,3 +621,8 @@ function cleanup()
   audio:rev_off ()
   
 end
+
+-- v1.0.0   Initial Release
+-- v1.1.0   Added Input Parameter
+-- v1.1.1   Fixed Input Parameter Bug
+-- v1.2.0   Expanded Pitch Options / Added Reverse
