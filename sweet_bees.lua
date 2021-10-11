@@ -1,5 +1,5 @@
 -- Sweet Bees
--- v1.3.0 @midworld
+-- v1.3.1 @midworld
 -- llllllll.co/t/sweet-bees
 -- 
 -- Two-Track Asynchronous
@@ -43,7 +43,7 @@ function init()
   params:add_option("INPUT >", "INPUT >", {"mono (left)", "stereo"}, 1)
   params:set_action("INPUT >", function(x) set_input(x) end)
   
-  params:add_option("OVERDUB >", "OVERDUB >", {"no", "yes"}, 1)
+  params:add_option("OVERDUB >", "OVERDUB >", {"disabled", "enabled"}, 1)
   params:set_action("OVERDUB >", function(x) set_overdub(x) end)
   
   -- Softcut
@@ -641,6 +641,7 @@ function cleanup()
   
 end
 
+-- v1.3.1   Edited Overdub Parameter
 -- v1.3.0   Added Overdub Parameter
 -- v1.2.0   Expanded Pitch Options / Added Reverse
 -- v1.1.1   Fixed Input Parameter Bug
