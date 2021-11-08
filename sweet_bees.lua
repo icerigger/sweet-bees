@@ -30,6 +30,13 @@ function init()
   audio.level_adc_cut(1)                                            -- sends audio input to softcut
   audio:rev_off()                                                   -- turns off system reverb
   
+  initial_rev_return_level = params:get('rev_return_level')         -- get user reverb settings
+  initial_rev_pre_delay = params:get('rev_pre_delay')
+  initial_rev_lf_fc = params:get('rev_lf_fc')
+  initial_rev_low_time = params:get('rev_low_time')
+  initial_rev_mid_time = params:get('rev_mid_time')
+  initial_rev_hf_damping = params:get('rev_hf_damping')
+  
   -- Animation Loop
   
   animation = metro.init()                                          -- creates the animation loop
@@ -73,20 +80,20 @@ function init()
   
   -- Honeycomb Reverb
   
-  honeycomb = {   {02,20,50,.1,01,1500},                            -- the honeycomb reverb is a series of presets for the system reverb.
-                  {02,20,50,.1,02,1500},                            -- specifically, the return level and mid time are affected
-                  {04,20,50,.1,03,1500},                            -- to provoke longer tails and mask the "gap" often associated
-                  {04,20,50,.1,04,1500},                            -- with handmade tape loops.
-                  {04,20,50,.1,05,1500},
-                  {04,20,50,.1,06,1500},
-                  {06,20,50,.1,07,1500},
-                  {06,20,50,.1,08,1500},
-                  {06,20,50,.1,09,1500},
-                  {06,20,50,.1,10,1500},
-                  {08,20,50,.1,11,1500},
-                  {08,20,50,.1,12,1500},
-                  {08,20,50,.1,13,1500},
-                  {08,20,50,.1,14,1500} }
+  honeycomb = {   {00,20,50,.1,03,1500},                            -- the honeycomb reverb is a series of presets for the system reverb.
+                  {00,20,50,.1,04,1500},                            -- specifically, the return level and mid time are affected
+                  {00,20,50,.1,05,1500},                            -- to provoke longer tails and mask the "gap" often associated
+                  {00,20,50,.1,06,1500},                            -- with handmade tape loops.
+                  {00,20,50,.1,07,1500},
+                  {00,20,50,.1,08,1500},
+                  {00,20,50,.1,09,1500},
+                  {00,20,50,.1,10,1500},
+                  {00,20,50,.1,11,1500},
+                  {00,20,50,.1,12,1500},
+                  {00,20,50,.1,13,1500},
+                  {00,20,50,.1,14,1500},
+                  {00,20,50,.1,15,1500},
+                  {00,20,50,.1,16,1500} }
   
   -- Sprites
   
@@ -638,7 +645,12 @@ end
 function cleanup()
   
   audio:rev_off ()
-  
+  params:set('rev_return_level', initial_rev_return_level)
+  params:set('rev_pre_delay', initial_rev_pre_delay)
+  params:set('rev_lf_fc', initial_rev_lf_fc)
+  params:set('rev_low_time', initial_rev_low_time)
+  params:set('rev_mid_time', initial_rev_mid_time)
+  params:set('rev_hf_damping', initial_rev_hf_damping)
 end
 
 -- v1.3.1   Edited Overdub Parameter
